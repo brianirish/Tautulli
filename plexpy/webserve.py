@@ -5000,7 +5000,7 @@ class WebInterface(object):
         log_file = (logfile or 'Plex Media Server') + '.log'
         log_file_path = os.path.join(plexpy.CONFIG.PMS_LOGS_FOLDER, log_file)
 
-        if log_file and os.path.isfile(log_file_path):
+        if log_file and helpers.is_subdir(log_file_path, plexpy.CONFIG.PMS_LOGS_FOLDER) and os.path.isfile(log_file_path):
             log_file_name = os.path.basename(log_file_path)
             return serve_download(log_file_path, name=log_file_name)
         else:
