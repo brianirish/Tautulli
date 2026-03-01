@@ -26,7 +26,8 @@ import os
 import re
 from string import Formatter
 import threading
-from typing import Optional
+import types
+from typing import Any, Callable, Optional
 
 import arrow
 import musicbrainzngs
@@ -1925,7 +1926,7 @@ def str_format(s, parameters):
     return s
 
 
-def str_eval(field_name, kwargs):
+def str_eval(field_name: str, kwargs: dict[str, Callable]) -> Any:
     field_name = field_name.strip('`')
     allowed_names = {
         'bool': bool,
@@ -1938,10 +1939,17 @@ def str_eval(field_name, kwargs):
     }
     allowed_names.update(kwargs)
     code = compile(field_name, '<string>', 'eval')
+    _check_names(code, allowed_names)
+    return eval(code, {'__builtins__': {}}, allowed_names)
+
+
+def _check_names(code: types.CodeType, allowed_names: dict[str, Callable]):
     for name in code.co_names:
         if name not in allowed_names:
-            raise NameError('Use of {name} not allowed'.format(name=name))
-    return eval(code, {'__builtins__': {}}, allowed_names)
+            raise NameError(f'Use of {name} not allowed')
+    for const in code.co_consts:
+        if isinstance(const, types.CodeType):
+            _check_names(const, allowed_names)
 
 
 class CustomFormatter(Formatter):
