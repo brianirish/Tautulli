@@ -247,6 +247,8 @@
 <script src="${http_root}js/dataTables.bootstrap.pagination.js"></script>
 
 <script>
+    var selected_user_id = "${_session['user_group']}" == "admin" ? null : "${_session['user_id']}";
+
     // Modal popup dialog
     function selectHandler(selectedDate, selectedSeries) {
 
@@ -355,8 +357,6 @@
 <script src="${http_root}js/graphs/plays_by_month.js${cache_param}"></script>
 <script>
     $(document).ready(function () {
-        var selected_user_id = "${_session['user_group']}" == "admin" ? null : "${_session['user_id']}";
-
         // Initial values for graph from local storage
         var yaxis = getLocalStorage('graph_type', 'plays');
         var current_day_range = getLocalStorage('graph_days', 30);
