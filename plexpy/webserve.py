@@ -6815,9 +6815,13 @@ class WebInterface(object):
             # Keep this for backwards compatibility for images through /newsletter/image
             if len(args) >= 2 and args[0] == 'image':
                 if args[1] == 'images':
-                    resource_dir = os.path.join(str(plexpy.PROG_DIR), 'data/interfaces/default/')
+                    resource_dir = os.path.join(plexpy.PROG_DIR, 'data/interfaces/default')
+                    img_path = os.path.join(resource_dir, *args[1:])
+                    if not helpers.is_subdir(img_path, resource_dir):
+                        return
+
                     try:
-                        return serve_file(path=os.path.join(resource_dir, *args[1:]), content_type='image/png')
+                        return serve_file(path=img_path, content_type='image/png')
                     except NotFound:
                         return
 
