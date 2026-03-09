@@ -650,6 +650,8 @@ General optional parameters:
                 else:
                     out = json.dumps(out, ensure_ascii=False)
                 if self._api_callback is not None:
+                    if not re.match(r'^[a-zA-Z_$][a-zA-Z0-9_$.]*$', self._api_callback):
+                        raise cherrypy.HTTPError(400, 'Invalid callback identifier')
                     cherrypy.response.headers['Content-Type'] = 'application/javascript'
                     # wrap with JSONP call if requested
                     out = self._api_callback + '(' + out + ');'
