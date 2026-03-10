@@ -847,6 +847,7 @@ def build_media_notify_params(notify_action=None, session=None, timeline=None, m
     elif notify_params['media_type'] == 'clip':
         if notify_params['extra_type']:
             poster_thumb = notify_params['art'].replace('/art', '/thumb') or notify_params['thumb']
+            notify_params['extra_text'] = common.EXTRA_TYPES.get(notify_params['extra_type'], '').lower()
         else:
             poster_thumb = notify_params['parent_thumb'] or notify_params['thumb']
         poster_key = notify_params['rating_key']
@@ -1118,6 +1119,8 @@ def build_media_notify_params(notify_action=None, session=None, timeline=None, m
         'machine_id': notify_params['machine_id'],
         # Source metadata parameters
         'media_type': notify_params['media_type'],
+        'extra_type': notify_params['extra_text'],
+        'preroll': int('prerolls://' in notify_params['guid']),
         'library_name': notify_params['library_name'],
         'title': notify_params['full_title'],
         'edition_title': notify_params['edition_title'],

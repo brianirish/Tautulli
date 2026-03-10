@@ -235,7 +235,8 @@ EXTRA_TYPES = {
     '5': 'Behind the Scenes',
     '6': 'Scene',
     '10': 'Featurette',
-    '11': 'Short'
+    '11': 'Short',
+    '12': 'Other',
 }
 
 SCHEDULER_LIST = [
@@ -509,6 +510,8 @@ NOTIFICATION_PARAMETERS = [
         'category': 'Source Metadata Details',
         'parameters': [
              {'name': 'Media Type', 'type': 'str', 'value': 'media_type', 'description': 'The type of media.', 'example': 'movie, show, season, episode, artist, album, track, clip'},
+             {'name': 'Extra Type', 'type': 'str', 'value': 'extra_type', 'description': 'The type of extra.', 'example': 'behind the scenes, deleted, featurette, interview, scene, short, trailer, other'},
+             {'name': 'Preroll', 'type': 'int', 'value': 'preroll', 'description': 'If the item is a preroll.', 'example': '0 or 1'},
              {'name': 'Library Name', 'type': 'str', 'value': 'library_name', 'description': 'The library name of the item.'},
              {'name': 'Title', 'type': 'str', 'value': 'title', 'description': 'The full title of the item.'},
              {'name': 'Edition Title', 'type': 'str', 'value': 'edition_title', 'description': 'The edition title of the movie.'},
