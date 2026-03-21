@@ -1,8 +1,6 @@
 import pickle
 from datetime import datetime, timezone
 
-from kazoo.exceptions import NodeExistsError, NoNodeError
-
 from apscheduler.job import Job
 from apscheduler.jobstores.base import BaseJobStore, ConflictingIdError, JobLookupError
 from apscheduler.util import (
@@ -12,21 +10,21 @@ from apscheduler.util import (
 )
 
 try:
-    from kazoo.client import KazooClient
+    from etcd3 import Etcd3Client
 except ImportError as exc:  # pragma: nocover
-    raise ImportError("ZooKeeperJobStore requires Kazoo installed") from exc
+    raise ImportError("EtcdJobStore requires etcd3 be installed") from exc
 
 
-class ZooKeeperJobStore(BaseJobStore):
+class EtcdJobStore(BaseJobStore):
     """
-    Stores jobs in a ZooKeeper tree. Any leftover keyword arguments are directly passed to
-    kazoo's `KazooClient
-    <http://kazoo.readthedocs.io/en/latest/api/client.html>`_.
+    Stores jobs in a etcd. Any leftover keyword arguments are directly passed to
+    etcd3's `etcd3.client
+    <https://python-etcd3.readthedocs.io/en/latest/readme.html>`_.
 
-    Plugin alias: ``zookeeper``
+    Plugin alias: ``etcd``
 
     :param str path: path to store jobs in
-    :param client: a :class:`~kazoo.client.KazooClient` instance to use instead of
+    :param client: a :class:`~etcd3.client.etcd3` instance to use instead of
         providing connection arguments
     :param int pickle_protocol: pickle protocol level to use (for serialization), defaults to the
         highest available
@@ -37,7 +35,7 @@ class ZooKeeperJobStore(BaseJobStore):
         path="/apscheduler",
         client=None,
         close_connection_on_exit=False,
-        pickle_protocol=pickle.HIGHEST_PROTOCOL,
+        pickle_protocol=pickle.DEFAULT_PROTOCOL,
         **connect_args,
     ):
         super().__init__()
@@ -52,26 +50,14 @@ class ZooKeeperJobStore(BaseJobStore):
         if client:
             self.client = maybe_ref(client)
         else:
-            self.client = KazooClient(**connect_args)
-        self._ensured_path = False
-
-    def _ensure_paths(self):
-        if not self._ensured_path:
-            self.client.ensure_path(self.path)
-        self._ensured_path = True
-
-    def start(self, scheduler, alias):
-        super().start(scheduler, alias)
-        if not self.client.connected:
-            self.client.start()
+            self.client = Etcd3Client(**connect_args)
 
     def lookup_job(self, job_id):
-        self._ensure_paths()
         node_path = self.path + "/" + str(job_id)
         try:
             content, _ = self.client.get(node_path)
-            doc = pickle.loads(content)
-            job = self._reconstitute_job(doc["job_state"])
+            content = pickle.loads(content)
+            job = self._reconstitute_job(content["job_state"])
             return job
         except BaseException:
             return None
@@ -79,71 +65,67 @@ class ZooKeeperJobStore(BaseJobStore):
     def get_due_jobs(self, now):
         timestamp = datetime_to_utc_timestamp(now)
         jobs = [
-            job_def["job"]
-            for job_def in self._get_jobs()
-            if job_def["next_run_time"] is not None
-            and job_def["next_run_time"] <= timestamp
+            job_record["job"]
+            for job_record in self._get_jobs()
+            if job_record["next_run_time"] is not None
+            and job_record["next_run_time"] <= timestamp
         ]
         return jobs
 
     def get_next_run_time(self):
         next_runs = [
-            job_def["next_run_time"]
-            for job_def in self._get_jobs()
-            if job_def["next_run_time"] is not None
+            job_record["next_run_time"]
+            for job_record in self._get_jobs()
+            if job_record["next_run_time"] is not None
         ]
         return utc_timestamp_to_datetime(min(next_runs)) if len(next_runs) > 0 else None
 
     def get_all_jobs(self):
-        jobs = [job_def["job"] for job_def in self._get_jobs()]
+        jobs = [job_record["job"] for job_record in self._get_jobs()]
         self._fix_paused_jobs_sorting(jobs)
         return jobs
 
     def add_job(self, job):
-        self._ensure_paths()
         node_path = self.path + "/" + str(job.id)
         value = {
             "next_run_time": datetime_to_utc_timestamp(job.next_run_time),
             "job_state": job.__getstate__(),
         }
         data = pickle.dumps(value, self.pickle_protocol)
-        try:
-            self.client.create(node_path, value=data)
-        except NodeExistsError:
+        status = self.client.put_if_not_exists(node_path, value=data)
+        if not status:
             raise ConflictingIdError(job.id)
 
     def update_job(self, job):
-        self._ensure_paths()
         node_path = self.path + "/" + str(job.id)
         changes = {
             "next_run_time": datetime_to_utc_timestamp(job.next_run_time),
             "job_state": job.__getstate__(),
         }
         data = pickle.dumps(changes, self.pickle_protocol)
-        try:
-            self.client.set(node_path, value=data)
-        except NoNodeError:
+        status, _ = self.client.transaction(
+            compare=[self.client.transactions.version(node_path) > 0],
+            success=[self.client.transactions.put(node_path, value=data)],
+            failure=[],
+        )
+        if not status:
             raise JobLookupError(job.id)
 
     def remove_job(self, job_id):
-        self._ensure_paths()
         node_path = self.path + "/" + str(job_id)
-        try:
-            self.client.delete(node_path)
-        except NoNodeError:
+        status, _ = self.client.transaction(
+            compare=[self.client.transactions.version(node_path) > 0],
+            success=[self.client.transactions.delete(node_path)],
+            failure=[],
+        )
+        if not status:
             raise JobLookupError(job_id)
 
     def remove_all_jobs(self):
-        try:
-            self.client.delete(self.path, recursive=True)
-        except NoNodeError:
-            pass
-        self._ensured_path = False
+        self.client.delete_prefix(self.path)
 
     def shutdown(self):
-        if self.close_connection_on_exit:
-            self.client.stop()
-            self.client.close()
+        self.client.close()
 
     def _reconstitute_job(self, job_state):
         job_state = job_state
@@ -154,42 +136,33 @@ class ZooKeeperJobStore(BaseJobStore):
         return job
 
     def _get_jobs(self):
-        self._ensure_paths()
         jobs = []
         failed_job_ids = []
-        all_ids = self.client.get_children(self.path)
-        for node_name in all_ids:
-            try:
-                node_path = self.path + "/" + node_name
-                content, _ = self.client.get(node_path)
-                doc = pickle.loads(content)
-                job_def = {
-                    "job_id": node_name,
-                    "next_run_time": doc["next_run_time"]
-                    if doc["next_run_time"]
-                    else None,
-                    "job_state": doc["job_state"],
-                    "job": self._reconstitute_job(doc["job_state"]),
-                    "creation_time": _.ctime,
-                }
-                jobs.append(job_def)
-            except BaseException:
-                self._logger.exception(
-                    'Unable to restore job "%s" -- removing it', node_name
-                )
-                failed_job_ids.append(node_name)
+        all_ids = list(self.client.get_prefix(self.path))
 
-        # Remove all the jobs we failed to restore
+        for doc, _ in all_ids:
+            try:
+                content = pickle.loads(doc)
+                job_record = {
+                    "next_run_time": content["next_run_time"],
+                    "job": self._reconstitute_job(content["job_state"]),
+                }
+                jobs.append(job_record)
+            except BaseException:
+                content = pickle.loads(doc)
+                failed_id = content["job_state"]["id"]
+                failed_job_ids.append(failed_id)
+                self._logger.exception(
+                    'Unable to restore job "%s" -- removing it', failed_id
+                )
+
         if failed_job_ids:
             for failed_id in failed_job_ids:
                 self.remove_job(failed_id)
         paused_sort_key = datetime(9999, 12, 31, tzinfo=timezone.utc)
         return sorted(
             jobs,
-            key=lambda job_def: (
-                job_def["job"].next_run_time or paused_sort_key,
-                job_def["creation_time"],
-            ),
+            key=lambda job_record: job_record["job"].next_run_time or paused_sort_key,
         )
 
     def __repr__(self):
