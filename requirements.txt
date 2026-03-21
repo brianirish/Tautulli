@@ -34,7 +34,6 @@ requests==2.32.4
 requests-oauthlib==2.0.0
 rumps==0.4.0; platform_system == "Darwin"
 simplejson==3.19.3
-tempora==5.7.0
 tokenize-rt==6.1.0
 tzlocal==5.3.1
 urllib3==2.6.3
