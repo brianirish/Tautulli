@@ -8,7 +8,6 @@ cherrypy==18.10.0
 cherrypy-cors==1.7.0
 cloudinary==1.44.1
 distro==1.9.0
-dnspython==2.7.0
 facebook-sdk==3.1.0
 ga4mp==2.0.4
 gntp==1.0.3
@@ -16,7 +15,7 @@ html5lib==1.1
 httpagentparser==1.9.9
 importlib-metadata==8.7.0
 importlib-resources==6.5.2
-git+https://github.com/Tautulli/ipwhois.git@master#egg=ipwhois
+ipwhois==1.3.0
 IPy==1.01
 Mako==1.3.10
 musicbrainzngs==0.7.1
