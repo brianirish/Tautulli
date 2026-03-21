@@ -33,5 +33,4 @@ websocket-client==1.9.0
 xmltodict==1.0.4
 
 # configobj==5.1.0
-# sgmllib3k==1.0.0
 # git+https://github.com/JonnyWong16/infi.systray.git@develop#egg=infi.systray
