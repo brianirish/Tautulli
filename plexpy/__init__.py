@@ -859,6 +859,7 @@ def dbcheck():
         "metadata_level INTEGER, media_info_level INTEGER, "
         "thumb_level INTEGER DEFAULT 0, art_level INTEGER DEFAULT 0,"
         "logo_level INTEGER DEFAULT 0, squareArt_level INTEGER DEFAULT 0, "
+        "theme_level INTEGER DEFAULT 0, "
         "custom_fields TEXT, individual_files INTEGER DEFAULT 0, "
         "file_size INTEGER DEFAULT 0, complete INTEGER DEFAULT 0, "
         "exported_items INTEGER DEFAULT 0, total_items INTEGER DEFAULT 0)"
@@ -2633,6 +2634,15 @@ def dbcheck():
         logger.debug("Altering database. Updating database table exports.")
         c_db.execute(
             "ALTER TABLE exports ADD COLUMN squareArt_level INTEGER DEFAULT 0"
+        )
+
+    # Upgrade exports table from earlier versions
+    try:
+        c_db.execute("SELECT theme_level FROM exports")
+    except sqlite3.OperationalError:
+        logger.debug("Altering database. Updating database table exports.")
+        c_db.execute(
+            "ALTER TABLE exports ADD COLUMN theme_level INTEGER DEFAULT 0"
         )
 
     # Fix unique constraints
