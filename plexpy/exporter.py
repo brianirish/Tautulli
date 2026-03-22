@@ -2073,7 +2073,7 @@ class Export(object):
                 self.exported_thumb = True
             elif any(f.endswith('.art.jpg') for f in files):
                 self.exported_art = True
-            elif any(f.endswith('.logo.jpg') for f in files):
+            elif any(f.endswith('.logo.png') for f in files):
                 self.exported_logo = True
 
     def _media_type(self, obj):
@@ -2353,7 +2353,7 @@ class Export(object):
             item_title = item.title
 
         dirpath = get_export_dirpath(self.directory, images_directory=self.title)
-        filename = helpers.clean_filename('{} [{}].{}.jpg'.format(item_title, rating_key, image))
+        ext = 'png' if image == 'logo' else 'jpg'
         filepath = os.path.join(dirpath, filename)
 
         if not os.path.exists(dirpath):
