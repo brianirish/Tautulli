@@ -41,7 +41,7 @@ class Export(object):
         'movie': (True, True, True, True, True),
         'show': (True, True, True, True, True),
         'season': (True, True, True, True, False),
-        'episode': (False, False, True, True, False),
+        'episode': (False, False, False, False, False),
         'artist': (True, True, True, True, True),
         'album': (True, True, True, True, False),
         'track': (False, False, False, False, False),
