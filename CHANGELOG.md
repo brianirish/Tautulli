@@ -1,5 +1,33 @@
 # Changelog
 
+## v2.17.0 (2026-03-27)
+
+* Important Note!
+  * Several security vulnerabilities have been identified in Tautulli versions <=2.16.1. Users are strongly encouraged to update to the latest Tautulli version 2.17.x.
+* Notifications:
+  * Fix: Prevent RCE in notification text evaluation. (CVE-2026-28505) (Thanks @q1uf3ng)
+* Newsletters:
+  * Fix: Media from other video libraries using the modern Plex agents not showing up on newsletter.
+  * Fix: Unauthenticated path traversal in /newsletter/image/images endpoint. (CVE-2026-31831) (Thanks @JakePeralta7)
+* Exporter:
+  * Fix: Logo images incorrectly exported as jpg instead of png.
+  * New: Added ability to export square art images.
+  * New: Added ability to export theme music. (#2654)
+* Graphs:
+  * Fix: History modal not opening when clicking on graphs. (#2652)
+* API:
+  * Fix: SQL injection in get_home_stats API command. (CVE-2026-31799) (Thanks @mandreko)
+  * Fix: Unsanitized JSONP callback parameter. (CVE-2026-32275) (Thanks @mandreko)
+  * New: Added rating to get_home_stats API command. (#2655) (Thanks @jma1ice)
+  * Removed: get_apikey API command.
+* Other:
+  * Fix: Validate log path for Plex log files. (#2632)
+  * Fix: Add authentication to /pms_image_proxy endpoint. (CVE-2026-31804) (Thanks @mandreko)
+  * New: Updated third party donation logos. (#2646) (Thanks @aisgbnok)
+  * New: Update Bootstrap CSS to v3.4.1 and decouple overrides (#2662) (Thanks @aisgbnok)
+  * New: Update Bootstrap-select to v1.13.18 (#2666) (Thanks @aisgbnok)
+
+
 ## v2.16.1 (2026-12-15)
 
 * Notifications:
@@ -19,14 +47,15 @@
 ## v2.16.0 (2025-09-08)
 
 * Important Note!
-  * Several security vulnerabilities have been identified in Tautulli versions <=2.15.3 (CVE-2025-58760, CVE-2025-58761, CVE-2025-58762, CVE-2025-58763). Users are strongly encouraged to update to the latest Tautulli version 2.16.x. (Thanks @d-xuan)
+  * Several security vulnerabilities have been identified in Tautulli versions <=2.15.3. Users are strongly encouraged to update to the latest Tautulli version 2.16.x.
 * UI:
   * Fix: Update poster click-through overlay to new Plex logo. (#2584) (Thanks @TheMeanCanEHdian)
 * Other:
-  * Fix: Race condition in image cache directory creation (#2580) (Thanks @keithah)
-  * Fix: Validate image path in /image and /pms_image_proxy endpoints.
-  * Fix: Validate image format in /pms_image_proxy endpoint.
-  * Fix: Don't run git command with shell.
+  * Fix: Race condition in image cache directory creation. (#2580) (Thanks @keithah)
+  * Fix: Validate image path in /image endpoints. (CVE-2025-58760) (Thanks @d-xuan)
+  * Fix: Validate image path in /pms_image_proxy endpoints. (CVE-2025-58761) (Thanks @d-xuan)
+  * Fix: Validate image format in /pms_image_proxy endpoint. (CVE-2025-58762) (Thanks @d-xuan)
+  * Fix: Don't run git command with shell. (CVE-2025-58763) (Thanks @d-xuan)
 
 
 ## v2.15.3 (2025-08-03)
