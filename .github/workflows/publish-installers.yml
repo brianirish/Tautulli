@@ -153,9 +153,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         id: create_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GHACTIONS_TOKEN }}
         with:
+          token: ${{ secrets.GHACTIONS_TOKEN }}
           tag_name: ${{ steps.get_version.outputs.RELEASE_VERSION }}
           name: Tautulli ${{ steps.get_version.outputs.RELEASE_VERSION }}
           body: |
