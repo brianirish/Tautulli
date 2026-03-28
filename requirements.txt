@@ -7,6 +7,7 @@ cheroot==11.1.2
 cherrypy==18.10.0
 cherrypy-cors==1.7.0
 cloudinary==1.44.1
+configobj==5.0.9
 distro==1.9.0
 ga4mp==2.0.4
 html5lib==1.1
@@ -32,5 +33,4 @@ xmltodict==1.0.4
 
 # facebook-sdk==3.1.0  # Manually patched for Python 3.13
 # gntp==1.0.3  # Manually patched for Python 3.13
-# configobj==5.1.0
 # git+https://github.com/JonnyWong16/infi.systray.git@develop#egg=infi.systray
