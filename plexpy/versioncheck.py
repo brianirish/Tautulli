@@ -312,6 +312,7 @@ def update():
                 logger.error('Unable to update from git: ' + line)
                 return
 
+        _, _ = runGit('clean -fd')
         clean_pyc()
 
     elif plexpy.INSTALL_TYPE == 'source':
