@@ -293,9 +293,6 @@ def check_github(scheduler=False, notify=False, use_cache=False):
 
 
 def update():
-    if not plexpy.UPDATE_AVAILABLE:
-        return
-
     if plexpy.INSTALL_TYPE in ('docker', 'snap', 'windows', 'macos'):
         return
 
