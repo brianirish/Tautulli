@@ -796,7 +796,7 @@ def upload_to_imgur(img_data, img_title='', rating_key='', fallback=''):
         return img_url, delete_hash
 
     headers = {'Authorization': 'Client-ID %s' % plexpy.CONFIG.IMGUR_CLIENT_ID}
-    data = {'image': base64.b64encode(img_data),
+    data = {'image': base64str(img_data),
             'title': img_title.encode('utf-8'),
             'name': str(rating_key) + '.png',
             'type': 'png'}
@@ -1590,7 +1590,7 @@ def browse_path(path=None, include_hidden=False, filter_ext=''):
         drives = ['%s:\\' % d for d in string.ascii_uppercase if os.path.exists('%s:' % d)]
         for drive in drives:
             out = {
-                'key': base64.b64encode(drive.encode('UTF-8')),
+                'key': base64str(drive),
                 'path': drive,
                 'title': drive,
                 'type': 'folder',
@@ -1607,7 +1607,7 @@ def browse_path(path=None, include_hidden=False, filter_ext=''):
     if path != os.path.dirname(path):
         parent_path = os.path.dirname(path)
         out = {
-            'key': base64.b64encode(parent_path.encode('UTF-8')),
+            'key': base64str(parent_path),
             'path': parent_path,
             'title': '..',
             'type': 'folder',
@@ -1617,7 +1617,7 @@ def browse_path(path=None, include_hidden=False, filter_ext=''):
     elif os.name == 'nt':
         parent_path = 'My Computer'
         out = {
-            'key': base64.b64encode(parent_path.encode('UTF-8')),
+            'key': base64str(parent_path),
             'path': parent_path,
             'title': parent_path,
             'type': 'folder',
@@ -1631,7 +1631,7 @@ def browse_path(path=None, include_hidden=False, filter_ext=''):
                 continue
             dir_path = os.path.join(root, d)
             out = {
-                'key': base64.b64encode(dir_path.encode('UTF-8')),
+                'key': base64str(dir_path),
                 'path': dir_path,
                 'title': d,
                 'type': 'folder',
@@ -1649,7 +1649,7 @@ def browse_path(path=None, include_hidden=False, filter_ext=''):
                 continue
             file_path = os.path.join(root, f)
             out = {
-                'key': base64.b64encode(file_path.encode('UTF-8')),
+                'key': base64str(file_path),
                 'path': file_path,
                 'title': f,
                 'type': 'file',
@@ -1741,3 +1741,7 @@ def is_subdir(child: str, parent: str) -> bool:
     child = Path(child).resolve()
     parent = Path(parent).resolve()
     return child.is_relative_to(parent)
+
+
+def base64str(text):
+    return base64.b64encode(text.encode('utf-8')).decode('utf-8')

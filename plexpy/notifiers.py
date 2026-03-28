@@ -4060,9 +4060,9 @@ class TAUTULLIREMOTEAPP(Notifier):
                        'contents': {'en': 'Tautulli Notification'},
                        'data': {'encrypted': True,
                                 'version': 2,
-                                'cipher_text': base64.b64encode(encrypted_data).decode('utf-8'),
-                                'nonce': base64.b64encode(nonce).decode('utf-8'),
-                                'salt': base64.b64encode(salt).decode('utf-8'),
+                                'cipher_text': helpers.base64str(encrypted_data),
+                                'nonce': helpers.base64str(nonce),
+                                'salt': helpers.base64str(salt),
                                 'server_id': plexpy.CONFIG.PMS_UUID}
                        }
         else:
