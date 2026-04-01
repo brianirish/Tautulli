@@ -1744,4 +1744,6 @@ def is_subdir(child: str, parent: str) -> bool:
 
 
 def base64str(text):
-    return base64.b64encode(text.encode('utf-8')).decode('utf-8')
+    if isinstance(text, str):
+        text = text.encode('utf-8')
+    return base64.b64encode(text).decode('utf-8')
