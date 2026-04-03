@@ -118,7 +118,7 @@ def get_server_resources(return_presence=False, return_server=False, return_info
 
 
 def notify_token_expired():
-    if not PlexTV().check_token():
+    if PlexTV().check_token() is False:
         plexpy.NOTIFY_QUEUE.put({'notify_action': 'on_tokenexpired'})
 
 
@@ -959,4 +959,5 @@ class PlexTV(object):
 
     def check_token(self):
         response = self.ping_plextv(return_response=True)
-        return response.status_code != 401
+        if response is not None:
+            return response.status_code != 401
