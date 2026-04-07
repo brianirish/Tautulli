@@ -802,7 +802,8 @@ class PrettyMetadata(object):
                 'imdb': 'IMDB',
                 'themoviedb': 'The Movie Database',
                 'thetvdb': 'TheTVDB',
-                'trakt': 'Trakt.tv'
+                'trakt': 'Trakt',
+                'simkl': 'Simkl'
                 }
 
     @staticmethod
@@ -813,7 +814,8 @@ class PrettyMetadata(object):
                 'themoviedb': 'The Movie Database',
                 'thetvdb': 'TheTVDB',
                 'tvmaze': 'TVmaze',
-                'trakt': 'Trakt.tv'
+                'trakt': 'Trakt',
+                'simkl': 'Simkl'
                 }
 
     @staticmethod
@@ -846,7 +848,9 @@ class PrettyMetadata(object):
         elif provider == 'tvmaze':
             provider_name = 'TVmaze'
         elif provider == 'trakt':
-            provider_name = 'Trakt.tv'
+            provider_name = 'Trakt'
+        elif provider == 'simkl':
+            provider_name = 'Simkl'
         elif provider == 'lastfm':
             provider_name = 'Last.fm'
         elif provider == 'musicbrainz':

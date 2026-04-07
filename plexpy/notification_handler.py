@@ -684,46 +684,52 @@ def build_media_notify_params(notify_action=None, session=None, timeline=None, m
 
     if 'imdb://' in notify_params['guid'] or notify_params['imdb_id']:
         notify_params['imdb_id'] = notify_params['imdb_id'] or notify_params['guid'].split('imdb://')[1].split('?')[0]
-        notify_params['imdb_url'] = 'https://www.imdb.com/title/' + notify_params['imdb_id']
-        notify_params['trakt_url'] = 'https://trakt.tv/search/imdb/' + notify_params['imdb_id']
+        notify_params['imdb_url'] = f'https://www.imdb.com/title/{notify_params["imdb_id"]}'
+        notify_params['trakt_url'] = f'https://trakt.tv/search/imdb/{notify_params["imdb_id"]}'
+        notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&imdb={notify_params["imdb_id"]}'
 
     if 'thetvdb://' in notify_params['guid'] or notify_params['thetvdb_id']:
         thetvdb_media_type = 'movie' if notify_params['media_type'] == 'movie' else 'series'
         notify_params['thetvdb_id'] = notify_params['thetvdb_id'] or notify_params['guid'].split('thetvdb://')[1].split('/')[0].split('?')[0]
         notify_params['thetvdb_url'] = f'https://thetvdb.com/dereferrer/{thetvdb_media_type}/{notify_params["thetvdb_id"]}'
-        notify_params['trakt_url'] = 'https://trakt.tv/search/tvdb/' + notify_params['thetvdb_id'] + '?id_type=show'
+        notify_params['trakt_url'] = f'https://trakt.tv/search/tvdb/{notify_params["thetvdb_id"]}?id_type=show'
+        notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&tvdb={notify_params["thetvdb_id"]}'
 
     elif 'thetvdbdvdorder://' in notify_params['guid']:
         notify_params['thetvdb_id'] = notify_params['guid'].split('thetvdbdvdorder://')[1].split('/')[0].split('?')[0]
         notify_params['thetvdb_url'] = f'https://thetvdb.com/dereferrer/series/{notify_params["thetvdb_id"]}'
-        notify_params['trakt_url'] = 'https://trakt.tv/search/tvdb/' + notify_params['thetvdb_id'] + '?id_type=show'
+        notify_params['trakt_url'] = f'https://trakt.tv/search/tvdb/{notify_params["thetvdb_id"]}?id_type=show'
+        notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&tvdb={notify_params["thetvdb_id"]}'
 
     if 'themoviedb://' in notify_params['guid'] or notify_params['themoviedb_id']:
         if notify_params['media_type'] == 'movie':
             notify_params['themoviedb_id'] = notify_params['themoviedb_id'] or notify_params['guid'].split('themoviedb://')[1].split('?')[0]
-            notify_params['themoviedb_url'] = 'https://www.themoviedb.org/movie/' + notify_params['themoviedb_id']
-            notify_params['trakt_url'] = 'https://trakt.tv/search/tmdb/' + notify_params['themoviedb_id'] + '?id_type=movie'
+            notify_params['themoviedb_url'] = f'https://www.themoviedb.org/movie/{notify_params["themoviedb_id"]}'
+            notify_params['trakt_url'] = f'https://trakt.tv/search/tmdb/{notify_params["themoviedb_id"]}?id_type=movie'
+            notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&tmdb={notify_params["themoviedb_id"]}'
 
         elif notify_params['media_type'] in ('show', 'season', 'episode'):
             notify_params['themoviedb_id'] = notify_params['themoviedb_id'] or notify_params['guid'].split('themoviedb://')[1].split('/')[0].split('?')[0]
-            notify_params['themoviedb_url'] = 'https://www.themoviedb.org/tv/' + notify_params['themoviedb_id']
-            notify_params['trakt_url'] = 'https://trakt.tv/search/tmdb/' + notify_params['themoviedb_id'] + '?id_type=show'
+            notify_params['themoviedb_url'] = f'https://www.themoviedb.org/tv/{notify_params["themoviedb_id"]}'
+            notify_params['trakt_url'] = f'https://trakt.tv/search/tmdb/{notify_params["themoviedb_id"]}?id_type=show'
+            notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&tmdb={notify_params["themoviedb_id"]}&type=show'
 
     if 'lastfm://' in notify_params['guid']:
         notify_params['lastfm_id'] = '/'.join(notify_params['guid'].split('lastfm://')[1].split('?')[0].split('/')[:2])
-        notify_params['lastfm_url'] = 'https://www.last.fm/music/' + notify_params['lastfm_id']
+        notify_params['lastfm_url'] = f'https://www.last.fm/music/{notify_params["lastfm_id"]}'
 
     if 'mbid://' in notify_params['guid'] or notify_params['musicbrainz_id']:
         if notify_params['media_type'] == 'artist':
-            notify_params['musicbrainz_url'] = 'https://musicbrainz.org/artist/' + notify_params['musicbrainz_id']
+            notify_params['musicbrainz_url'] = f'https://musicbrainz.org/artist/{notify_params["musicbrainz_id"]}'
         elif notify_params['media_type'] == 'album':
-            notify_params['musicbrainz_url'] = 'https://musicbrainz.org/release/' + notify_params['musicbrainz_id']
+            notify_params['musicbrainz_url'] = f'https://musicbrainz.org/release/{notify_params["musicbrainz_id"]}'
         else:
-            notify_params['musicbrainz_url'] = 'https://musicbrainz.org/track/' + notify_params['musicbrainz_id']
+            notify_params['musicbrainz_url'] = f'https://musicbrainz.org/track/{notify_params["musicbrainz_id"]}'
 
     if 'hama://' in notify_params['guid']:
         notify_params['anidb_id'] = notify_params['guid'].split('hama://')[1].split('/')[0].split('?')[0].split('-')[1]
-        notify_params['anidb_url'] = 'https://anidb.net/anime/' + notify_params['anidb_id']
+        notify_params['anidb_url'] = f'https://anidb.net/anime/{notify_params["anidb_id"]}'
+        notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&anidb={notify_params["anidb_id"]}'
 
     # Get TheMovieDB info (for movies and tv only)
     if plexpy.CONFIG.THEMOVIEDB_LOOKUP and notify_params['media_type'] in ('movie', 'show', 'season', 'episode'):
@@ -770,10 +776,10 @@ def build_media_notify_params(notify_action=None, session=None, timeline=None, m
             notify_params.update(themoviedb_info)
 
             if themoviedb_info.get('imdb_id'):
-                notify_params['imdb_url'] = 'https://www.imdb.com/title/' + themoviedb_info['imdb_id']
+                notify_params['imdb_url'] = f'https://www.imdb.com/title/{themoviedb_info["imdb_id"]}'
             if themoviedb_info.get('themoviedb_id'):
-                notify_params['trakt_url'] = 'https://trakt.tv/search/tmdb/{}?id_type={}'.format(
-                    notify_params['themoviedb_id'], 'show' if lookup_media_type == 'tv' else 'movie')
+                notify_params['trakt_url'] = f'https://trakt.tv/search/tmdb/{notify_params["themoviedb_id"]}?id_type={"show" if lookup_media_type == "tv" else "movie"}'
+                notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&tmdb={notify_params["themoviedb_id"]}&type={"show" if lookup_media_type == "tv" else "movie"}'
 
     # Get TVmaze info (for tv shows only)
     if plexpy.CONFIG.TVMAZE_LOOKUP and notify_params['media_type'] in ('show', 'season', 'episode'):
@@ -797,10 +803,12 @@ def build_media_notify_params(notify_action=None, session=None, timeline=None, m
 
             if tvmaze_info.get('thetvdb_id'):
                 notify_params['thetvdb_url'] = f'https://thetvdb.com/dereferrer/series/{tvmaze_info["thetvdb_id"]}'
-                notify_params['trakt_url'] = 'https://trakt.tv/search/tvdb/{}' + str(notify_params['thetvdb_id']) + '?id_type=show'
+                notify_params['trakt_url'] = f'https://trakt.tv/search/tvdb/{notify_params["thetvdb_id"]}?id_type=show'
+                notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&tvdb={notify_params["thetvdb_id"]}'
             if tvmaze_info.get('imdb_id'):
-                notify_params['imdb_url'] = 'https://www.imdb.com/title/' + tvmaze_info['imdb_id']
-                notify_params['trakt_url'] = 'https://trakt.tv/search/imdb/' + notify_params['imdb_id']
+                notify_params['imdb_url'] = f'https://www.imdb.com/title/{tvmaze_info["imdb_id"]}'
+                notify_params['trakt_url'] = f'https://trakt.tv/search/imdb/{notify_params["imdb_id"]}'
+                notify_params['simkl_url'] = f'https://api.simkl.com/redirect?to=Simkl&imdb={notify_params["imdb_id"]}'
 
     # Get MusicBrainz info (for music only)
     if plexpy.CONFIG.MUSICBRAINZ_LOOKUP and notify_params['media_type'] in ('artist', 'album', 'track'):
@@ -1193,6 +1201,7 @@ def build_media_notify_params(notify_action=None, session=None, timeline=None, m
         'anidb_url': notify_params['anidb_url'],
         'lastfm_url': notify_params['lastfm_url'],
         'trakt_url': notify_params['trakt_url'],
+        'simkl_url': notify_params['simkl_url'],
         'container': notify_params['container'],
         'bitrate': notify_params['bitrate'],
         'aspect_ratio': notify_params['aspect_ratio'],
