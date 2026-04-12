@@ -5013,18 +5013,21 @@ class WebInterface(object):
     @addtoapi()
     def delete_image_cache(self, **kwargs):
         """ Delete and recreate the image cache directory. """
-        return self.delete_cache(folder='images')
+        return self.delete_cache(images=True)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     @requireAuth(member_of("admin"))
     @addtoapi()
-    def delete_cache(self, folder='', **kwargs):
+    def delete_cache(self, images=False, **kwargs):
         """ Delete and recreate the cache directory. """
+        folder = 'images' if images else ''
+        
         cache_dir = os.path.join(plexpy.CONFIG.CACHE_DIR, folder)
         result = 'success'
-        msg = 'Cleared the %scache.' % (folder + ' ' if folder else '')
+        msg = f'Cleared the {folder + " " if folder else ""}cache.'
         try:
+            logger.info(f'Clearing {folder + " " if folder else ""}cache...')
             shutil.rmtree(cache_dir, ignore_errors=True)
         except OSError as e:
             result = 'error'
