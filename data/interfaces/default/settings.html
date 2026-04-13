@@ -256,6 +256,18 @@
                         </div>
 
                         <div class="padded-header">
+                            <h3>Reporting Exclusions</h3>
+                        </div>
+
+                        <p class="help-block">
+                            Users checked below will be hidden from all reports, statistics, history tables,
+                            and graphs. Their data is kept in the database and can be re-included at any time.
+                        </p>
+                        <div id="reporting-exclusions-list">
+                            <p class="text-muted"><em>Loading users...</em></p>
+                        </div>
+
+                        <div class="padded-header">
                             <h3>Updates</h3>
                         </div>
 
@@ -3252,5 +3264,57 @@ $(document).ready(function() {
 
     toggleRevealTokens();
 });
+
+// Reporting Exclusions
+function loadReportingExclusions() {
+    $.ajax({
+        url: 'get_full_users_list',
+        cache: false,
+        async: true,
+        success: function(data) {
+            var container = $('#reporting-exclusions-list');
+            container.empty();
+            if (!data || data.length === 0) {
+                container.html('<p class="text-muted"><em>No users found.</em></p>');
+                return;
+            }
+            var html = '<ul class="list-unstyled">';
+            $.each(data, function(i, user) {
+                var thumb = user.thumb || '/images/default_user_thumb.png';
+                var name = user.friendly_name || user.username;
+                var checked = user.exclude_from_reports ? 'checked' : '';
+                html += '<li style="margin-bottom: 8px;">' +
+                    '<label style="font-weight: normal; cursor: pointer;">' +
+                    '<input type="checkbox" class="exclude-from-reports-toggle" ' +
+                        'data-user-id="' + user.user_id + '" ' + checked + ' ' +
+                        'style="margin-right: 6px;"> ' +
+                    '<img src="' + thumb + '" width="20" height="20" ' +
+                        'style="border-radius: 50%; margin-right: 6px; vertical-align: middle;" ' +
+                        'onerror="this.src=\'/images/default_user_thumb.png\'"> ' +
+                    name +
+                    '</label></li>';
+            });
+            html += '</ul>';
+            container.html(html);
+
+            // Bind toggle handler
+            container.on('change', '.exclude-from-reports-toggle', function() {
+                var userId = $(this).data('user-id');
+                var exclude = $(this).is(':checked') ? 1 : 0;
+                $.ajax({
+                    url: 'set_exclude_from_reports',
+                    data: { user_id: userId, exclude: exclude },
+                    cache: false,
+                    async: true
+                });
+            });
+        },
+        error: function() {
+            $('#reporting-exclusions-list').html('<p class="text-danger">Failed to load users.</p>');
+        }
+    });
+}
+
+loadReportingExclusions();
 </script>
 </%def>
