@@ -1377,6 +1377,7 @@ class WebInterface(object):
         do_notify = kwargs.get('do_notify', 0)
         keep_history = kwargs.get('keep_history', 0)
         allow_guest = kwargs.get('allow_guest', 0)
+        exclude_from_reports = kwargs.get('exclude_from_reports', None)
 
         if user_id:
             try:
@@ -1386,29 +1387,13 @@ class WebInterface(object):
                                      custom_thumb=custom_thumb,
                                      do_notify=do_notify,
                                      keep_history=keep_history,
-                                     allow_guest=allow_guest)
+                                     allow_guest=allow_guest,
+                                     exclude_from_reports=exclude_from_reports)
                 status_message = "Successfully updated user."
                 return status_message
             except:
                 status_message = "Failed to update user."
                 return status_message
-
-    @cherrypy.expose
-    @cherrypy.tools.json_out()
-    @requireAuth(member_of("admin"))
-    def set_exclude_from_reports(self, user_id=None, exclude=0, **kwargs):
-        if str(user_id).isdigit():
-            try:
-                monitor_db = database.MonitorDatabase()
-                monitor_db.action(
-                    'UPDATE users SET exclude_from_reports = ? WHERE user_id = ?',
-                    [1 if int(exclude) else 0, int(user_id)]
-                )
-                return {'result': 'success', 'message': 'Updated successfully.'}
-            except Exception as e:
-                logger.warn("Tautulli WebInterface :: Unable to set exclude_from_reports: %s." % e)
-                return {'result': 'error', 'message': 'Failed to update.'}
-        return {'result': 'error', 'message': 'Missing user_id.'}
 
     @cherrypy.expose
     @requireAuth()

@@ -389,6 +389,7 @@ class Users(object):
                           'do_notify': 0,
                           'keep_history': 1,
                           'allow_guest': 0,
+                          'exclude_from_reports': 0,
                           'deleted_user': 0,
                           'shared_libraries': (),
                           'last_seen': None
@@ -448,7 +449,7 @@ class Users(object):
                     "thumb AS user_thumb, custom_avatar_url AS custom_thumb, " \
                     "email, is_active, is_admin, is_home_user, is_allow_sync, is_restricted, " \
                     "do_notify, keep_history, deleted_user, " \
-                    "allow_guest, shared_libraries, %s AS last_seen " \
+                    "allow_guest, exclude_from_reports, shared_libraries, %s AS last_seen " \
                     "FROM users %s " \
                     "WHERE %s COLLATE NOCASE" % (last_seen, join, where)
             result = monitor_db.select(query, args=args)
@@ -490,6 +491,7 @@ class Users(object):
                                 'keep_history': item['keep_history'],
                                 'deleted_user': item['deleted_user'],
                                 'allow_guest': item['allow_guest'],
+                                'exclude_from_reports': item['exclude_from_reports'] or 0,
                                 'shared_libraries': shared_libraries,
                                 'last_seen': item['last_seen']
                                 }
