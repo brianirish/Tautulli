@@ -1402,7 +1402,7 @@ class WebInterface(object):
                 monitor_db = database.MonitorDatabase()
                 monitor_db.action(
                     'UPDATE users SET exclude_from_reports = ? WHERE user_id = ?',
-                    [int(exclude), int(user_id)]
+                    [1 if int(exclude) else 0, int(user_id)]
                 )
                 return {'result': 'success', 'message': 'Updated successfully.'}
             except Exception as e:

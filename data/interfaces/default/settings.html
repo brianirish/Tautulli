@@ -3291,7 +3291,7 @@ function loadReportingExclusions() {
                     '<img src="' + thumb + '" width="20" height="20" ' +
                         'style="border-radius: 50%; margin-right: 6px; vertical-align: middle;" ' +
                         'onerror="this.src=\'/images/default_user_thumb.png\'"> ' +
-                    name +
+                    $('<span>').text(name).html() +
                     '</label></li>';
             });
             html += '</ul>';
@@ -3301,11 +3301,20 @@ function loadReportingExclusions() {
             container.on('change', '.exclude-from-reports-toggle', function() {
                 var userId = $(this).data('user-id');
                 var exclude = $(this).is(':checked') ? 1 : 0;
+                var checkbox = $(this);
                 $.ajax({
                     url: 'set_exclude_from_reports',
                     data: { user_id: userId, exclude: exclude },
                     cache: false,
-                    async: true
+                    async: true,
+                    success: function(data) {
+                        if (data.result !== 'success') {
+                            checkbox.prop('checked', !exclude);
+                        }
+                    },
+                    error: function() {
+                        checkbox.prop('checked', !exclude);
+                    }
                 });
             });
         },
