@@ -198,6 +198,9 @@ class DataFactory(object):
             table_name_union = None
             custom_where_union = group_by_union = columns_union = []
 
+        # Exclude users flagged for report exclusion (applied after union to avoid sessions table schema conflict)
+        custom_where.append(['users.exclude_from_reports', [0, None]])
+
         try:
             query = data_tables.ssp_query(table_name='session_history',
                                           table_name_union=table_name_union,
