@@ -1241,4 +1241,8 @@ class Graphs(object):
             user_ids = helpers.split_strip(user_id)
             if all(id.isdigit() for id in user_ids):
                 user_cond = cond_prefix + ' session_history.user_id IN (%s) ' % ','.join(user_ids)
+
+        user_cond += ('AND session_history.user_id NOT IN '
+                      '(SELECT user_id FROM users WHERE exclude_from_reports = 1 '
+                      'AND user_id IS NOT NULL) ')
         return user_cond
