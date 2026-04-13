@@ -1397,12 +1397,12 @@ class WebInterface(object):
     @cherrypy.tools.json_out()
     @requireAuth(member_of("admin"))
     def set_exclude_from_reports(self, user_id=None, exclude=0, **kwargs):
-        if user_id:
+        if str(user_id).isdigit():
             try:
                 monitor_db = database.MonitorDatabase()
                 monitor_db.action(
                     'UPDATE users SET exclude_from_reports = ? WHERE user_id = ?',
-                    [int(exclude), user_id]
+                    [int(exclude), int(user_id)]
                 )
                 return {'result': 'success', 'message': 'Updated successfully.'}
             except Exception as e:
