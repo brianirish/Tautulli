@@ -351,13 +351,15 @@ class Users(object):
 
         return dict
 
-    def set_config(self, user_id=None, friendly_name='', custom_thumb='', do_notify=1, keep_history=1, allow_guest=1, exclude_from_reports=0):
+    def set_config(self, user_id=None, friendly_name='', custom_thumb='', do_notify=1, keep_history=1, allow_guest=1, exclude_from_reports=None):
         if str(user_id).isdigit():
             monitor_db = database.MonitorDatabase()
 
-            user = monitor_db.select_single('SELECT username FROM users WHERE user_id = ?', [user_id])
+            user = monitor_db.select_single('SELECT username, exclude_from_reports FROM users WHERE user_id = ?', [user_id])
             if user.get('username') == friendly_name:
                 friendly_name = None
+            if exclude_from_reports is None:
+                exclude_from_reports = user.get('exclude_from_reports') or 0
 
             key_dict = {'user_id': user_id}
             value_dict = {'friendly_name': friendly_name,
@@ -701,7 +703,7 @@ class Users(object):
                     'do_notify': item['do_notify'],
                     'keep_history': item['keep_history'],
                     'allow_guest': item['allow_guest'],
-                    'exclude_from_reports': item['exclude_from_reports'],
+                    'exclude_from_reports': item['exclude_from_reports'] or 0,
                     'shared_libraries': shared_libraries,
                     'filter_all': item['filter_all'],
                     'filter_movies': item['filter_movies'],
