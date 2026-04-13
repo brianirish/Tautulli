@@ -1394,6 +1394,23 @@ class WebInterface(object):
                 return status_message
 
     @cherrypy.expose
+    @cherrypy.tools.json_out()
+    @requireAuth(member_of("admin"))
+    def set_exclude_from_reports(self, user_id=None, exclude=0, **kwargs):
+        if user_id:
+            try:
+                monitor_db = database.MonitorDatabase()
+                monitor_db.action(
+                    'UPDATE users SET exclude_from_reports = ? WHERE user_id = ?',
+                    [int(exclude), user_id]
+                )
+                return {'result': 'success', 'message': 'Updated successfully.'}
+            except Exception as e:
+                logger.warn("Tautulli WebInterface :: Unable to set exclude_from_reports: %s." % e)
+                return {'result': 'error', 'message': 'Failed to update.'}
+        return {'result': 'error', 'message': 'Missing user_id.'}
+
+    @cherrypy.expose
     @requireAuth()
     def user_watch_time_stats(self, user=None, user_id=None, **kwargs):
         if not allow_session_user(user_id):
