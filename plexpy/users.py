@@ -351,7 +351,7 @@ class Users(object):
 
         return dict
 
-    def set_config(self, user_id=None, friendly_name='', custom_thumb='', do_notify=1, keep_history=1, allow_guest=1):
+    def set_config(self, user_id=None, friendly_name='', custom_thumb='', do_notify=1, keep_history=1, allow_guest=1, exclude_from_reports=0):
         if str(user_id).isdigit():
             monitor_db = database.MonitorDatabase()
 
@@ -364,7 +364,8 @@ class Users(object):
                           'custom_avatar_url': custom_thumb,
                           'do_notify': do_notify,
                           'keep_history': keep_history,
-                          'allow_guest': allow_guest
+                          'allow_guest': allow_guest,
+                          'exclude_from_reports': exclude_from_reports
                           }
             try:
                 monitor_db.upsert('users', value_dict, key_dict)
@@ -674,7 +675,7 @@ class Users(object):
         try:
             query = "SELECT id AS row_id, user_id, username, friendly_name, thumb, custom_avatar_url, email, " \
                     "is_active, is_admin, is_home_user, is_allow_sync, is_restricted, " \
-                    "do_notify, keep_history, allow_guest, shared_libraries, " \
+                    "do_notify, keep_history, allow_guest, shared_libraries, exclude_from_reports, " \
                     "filter_all, filter_movies, filter_tv, filter_music, filter_photos " \
                     "FROM users %s" % where
             result = monitor_db.select(query=query)
@@ -700,6 +701,7 @@ class Users(object):
                     'do_notify': item['do_notify'],
                     'keep_history': item['keep_history'],
                     'allow_guest': item['allow_guest'],
+                    'exclude_from_reports': item['exclude_from_reports'],
                     'shared_libraries': shared_libraries,
                     'filter_all': item['filter_all'],
                     'filter_movies': item['filter_movies'],
